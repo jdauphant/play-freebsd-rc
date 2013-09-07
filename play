@@ -1,0 +1,61 @@
+#!/bin/sh                                                                                           
+# DAUPHANT Julien 2013
+
+# PROVIDE: play 
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+#
+# Add the following line to /etc/rc.conf to enable play:
+#
+# play_NAME_enable="YES"
+# play_NAME_path="/var/www/myplayproject"
+# play_NAME_user="play" 
+# play_NAME_playpath="/usr/local/opt/play"
+
+. /etc/rc.subr
+
+case "$0" in
+/etc/rc*)
+        # during boot (shutdown) $0 is /etc/rc (/etc/rc.shutdown),
+        # so get the name of the script from $_file
+        name="$_file"
+        ;;
+*)
+        name="$0"
+        ;;
+esac
+
+name="${name##*/}"
+rcvar=${name}_enable
+
+start_cmd="play_start"
+stop_cmd="play_stop"
+
+load_rc_config $name
+
+eval ": \${${name}_enable:=\"NO\"}"
+eval ": \${${name}_playpath:=\"/usr/local/opt/play\"}"
+v_play_path="$(eval echo \${${name}_path})"
+v_play_user="$(eval echo \${${name}_user})"
+v_play_playpath="$(eval echo \${${name}_playpath})"
+
+procname="play"
+
+pidfile="${v_play_path}/server.pid"
+daemon_args=" "
+
+play_start()
+{
+        echo "Try to start ${v_play_path}"
+        [ -f ${pidfile} ] && echo "The PID file exist" && ( play_stop ;  rm ${pidfile} )
+        su -l ${v_play_user} -c "${v_play_playpath}/${procname} ${daemon_args} start ${v_play_path}"
+        echo "Start ${v_play_path} "
+}
+
+play_stop()
+{
+        su -l ${v_play_user} -c "${v_play_playpath}/${procname} ${daemon_args} stop ${v_play_path}"
+        echo "Stop ${v_play_path} "
+}
+
+run_rc_command "$1"
