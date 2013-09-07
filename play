@@ -1,4 +1,4 @@
-#!/bin/sh                                                                                           
+#!/bin/sh
 # DAUPHANT Julien 2013
 
 # PROVIDE: play 
@@ -11,6 +11,7 @@
 # play_NAME_path="/var/www/myplayproject"
 # play_NAME_user="play" 
 # play_NAME_playpath="/usr/local/opt/play"
+# play_NAME_port="" # Only for play 2
 
 . /etc/rc.subr
 
@@ -35,27 +36,34 @@ load_rc_config $name
 
 eval ": \${${name}_enable:=\"NO\"}"
 eval ": \${${name}_playpath:=\"/usr/local/opt/play\"}"
+eval ": \${${name}_port:=\"\"}"
+
 v_play_path="$(eval echo \${${name}_path})"
 v_play_user="$(eval echo \${${name}_user})"
 v_play_playpath="$(eval echo \${${name}_playpath})"
+v_play_port="$(eval echo \${${name}_port})"
 
 procname="play"
 
 pidfile="${v_play_path}/server.pid"
-daemon_args=" "
+daemon_args=""
+if [ ${v_play_port} != "" ] ; then
+        daemon_args=" ${v_play_port}"
+fi
 
 play_start()
 {
         echo "Try to start ${v_play_path}"
         [ -f ${pidfile} ] && echo "The PID file exist" && ( play_stop ;  rm ${pidfile} )
-        su -l ${v_play_user} -c "${v_play_playpath}/${procname} ${daemon_args} start ${v_play_path}"
-        echo "Start ${v_play_path} "
+        su -l ${v_play_user} -c "cd ${v_play_path}; ${v_play_playpath}/${procname} \"start${daemon_args}\" &"
+        echo "Start ${v_play_path} ${daemon_args}"
 }
 
 play_stop()
 {
-        su -l ${v_play_user} -c "${v_play_playpath}/${procname} ${daemon_args} stop ${v_play_path}"
-        echo "Stop ${v_play_path} "
+        su -l ${v_play_user} -c "cd ${v_play_path}; ${v_play_playpath}/${procname} stop  &"
+        echo "Stop ${v_play_path} ${daemon_args}"
 }
 
 run_rc_command "$1"
+
