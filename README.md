@@ -9,10 +9,11 @@ INSTALLATION
 
 USAGE
 -----
-* create a synlink ln -s /usr/local/etc/rc.d/play /usr/local/etc/rc.d/play_applicationName
+* create a synlink ln -s /usr/local/etc/rc.d/play /usr/local/etc/rc.d/play_ApplicationName
 * add these lines to your rc.conf :
 
-    play_ApplicationName_enable="YES"
-    play_ApplicationName_path="/var/www/ApplicationName"
-    play_ApplicationName_user="play" 
-    play_ApplicationName_playpath="/usr/local/opt/play"
+     `play_ApplicationName_enable="YES"
+     play_ApplicationName_path="/var/www/ApplicationName"
+     play_ApplicationName_user="play" 
+     play_ApplicationName_playpath="/usr/local/opt/play"`
+
